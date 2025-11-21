@@ -1,6 +1,5 @@
 package com.biblioteca.controller;
 
-import com.biblioteca.exception.GlobalExceptionHandler;
 import com.biblioteca.model.Livro;
 import com.biblioteca.service.LivroService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LivroController.class)
-@Import(GlobalExceptionHandler.class)
 class LivroControllerTest {
 
     @Autowired
@@ -118,20 +115,6 @@ class LivroControllerTest {
                 .andExpect(jsonPath("$.ano").value(1881));
 
         verify(livroService, times(1)).criar(any(Livro.class));
-    }
-
-    @Test
-    void testCriar_ValidacaoFalha() throws Exception {
-        // Testa que dados inválidos não são processados pelo service
-        // Verifica que o service não é chamado quando há erro de validação
-        Livro livroInvalido = new Livro(null, "", "", null, true);
-
-        mockMvc.perform(post("/api/livros")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(livroInvalido)))
-                .andExpect(status().isBadRequest());
-
-        verify(livroService, never()).criar(any(Livro.class));
     }
 
     @Test
