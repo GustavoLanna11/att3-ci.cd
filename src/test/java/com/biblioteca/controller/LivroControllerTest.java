@@ -8,9 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,16 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LivroController.class)
-@Import(LivroControllerTest.TestConfig.class)
+@Import(GlobalExceptionHandler.class)
 class LivroControllerTest {
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public GlobalExceptionHandler globalExceptionHandler() {
-            return new GlobalExceptionHandler();
-        }
-    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -132,6 +122,8 @@ class LivroControllerTest {
 
     @Test
     void testCriar_ValidacaoFalha() throws Exception {
+        // Testa que dados inválidos não são processados pelo service
+        // Verifica que o service não é chamado quando há erro de validação
         Livro livroInvalido = new Livro(null, "", "", null, true);
 
         mockMvc.perform(post("/api/livros")
