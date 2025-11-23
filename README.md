@@ -18,6 +18,7 @@ API REST para gestão de livros em biblioteca desenvolvida com Spring Boot.
 - Maven
 - JUnit 5
 - Mockito
+- Docker
 
 ## 📦 Estrutura do Projeto
 
@@ -30,8 +31,10 @@ src/
 │   │   │   └── LivroController.java
 │   │   ├── model/
 │   │   │   └── Livro.java
-│   │   └── service/
-│   │       └── LivroService.java
+│   │   ├── service/
+│   │   │   └── LivroService.java
+│   │   └── exception/
+│   │       └── GlobalExceptionHandler.java
 │   └── resources/
 │       └── application.properties
 └── test/
@@ -69,21 +72,67 @@ java -jar target/biblioteca-api-1.0.0.jar
 
 A aplicação estará disponível em: `http://localhost:8080`
 
+## 🐳 Docker
+
+### Construir a imagem Docker:
+
+```bash
+docker build -t biblioteca-api:latest .
+```
+
+### Executar o container:
+
+```bash
+docker run -p 8080:8080 biblioteca-api:latest
+```
+
+A aplicação estará disponível em: `http://localhost:8080`
+
+### Executar com Docker Compose (opcional):
+
+```bash
+docker-compose up
+```
+
 ## 🔄 CI/CD
 
-O projeto inclui um workflow do GitHub Actions (`.github/workflows/ci-cd.yml`) que:
+O projeto inclui dois workflows do GitHub Actions:
+
+### 1. CI/CD Pipeline (`.github/workflows/ci-cd.yml`)
+
+Executa em branches: `main`, `master`, `develop`
 
 1. **Test** - Executa todos os testes unitários
 2. **Build** - Gera o artefato JAR após os testes passarem
 
-O workflow é acionado em:
-- Push para branches: `main`, `master`, `develop`
-- Pull requests para essas branches
+### 2. Docker CD Pipeline (`.github/workflows/docker-cd.yml`)
+
+Executa apenas na branch: `docker-deploy`
+
+1. **Test** - Executa testes usando container Maven
+2. **Build and Push** - Constrói e envia a imagem Docker para Docker Hub
+
+### Configuração do Docker Hub
+
+Para que o workflow funcione, configure os seguintes secrets no GitHub:
+
+1. Vá em **Settings** → **Secrets and variables** → **Actions**
+2. Adicione:
+   - `DOCKER_USERNAME`: Seu nome de usuário do Docker Hub
+   - `DOCKER_PASSWORD`: Seu token de acesso do Docker Hub
+
+#### Como obter o token do Docker Hub:
+
+1. Acesse https://hub.docker.com/settings/security
+2. Clique em **New Access Token**
+3. Crie um token com permissão de **Read & Write**
+4. Copie o token e adicione como `DOCKER_PASSWORD` nos secrets
 
 ### Artefatos Gerados
 
 - **Test Results**: Relatórios de testes em `target/surefire-reports/`
 - **JAR File**: Artefato final em `target/biblioteca-api-*.jar`
+- **Docker Image**: Imagem Docker publicada no Docker Hub
 
 ## 📝 Modelo de Dados
 
@@ -150,6 +199,17 @@ curl -X PUT http://localhost:8080/api/livros/1 \
 curl -X DELETE http://localhost:8080/api/livros/1
 ```
 
+## 🚢 Deploy
+
+### Usando Docker Hub:
+
+Após o workflow executar na branch `docker-deploy`, a imagem estará disponível:
+
+```bash
+docker pull <seu-usuario>/biblioteca-api:latest
+docker run -p 8080:8080 <seu-usuario>/biblioteca-api:latest
+```
+
 ## 👨‍💻 Autor
 
-Desenvolvido como parte de uma atividade de CI/CD com Spring Boot.
+Desenvolvido como parte de uma atividade de CI/CD com Spring Boot e Docker.

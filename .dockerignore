@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.github/
+README.md
+LICENSE
+*.md
+.idea/
+.vscode/
+*.iml
+
